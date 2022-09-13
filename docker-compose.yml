@@ -2,14 +2,14 @@ version: '2'
 services:
   web:
     build: .
-    command: npm run start
+    command: npm run dev
     networks:
       - mern-stack-net
     volumes:
       - .:/usr/app/
       - /usr/app/node_modules
     ports:
-      - "3000:5000"
+      - '3000:5000'
     depends_on:
       - db
     environment:

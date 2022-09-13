@@ -8,6 +8,7 @@ import cors from 'cors';
 import compress from 'compression';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
+import formatError from './utils/error';
 import { PostResolver } from './resolvers';
 import taskRouter from './routes/tasks';
 import authRouter from './routes/auth';
@@ -75,6 +76,7 @@ async function startMongo() {
       validate: true,
     }),
     context: ({ req, res }) => ({ req, res }),
+    formatError,
   });
   await apolloServer.start();
   apolloServer.applyMiddleware({ app, cors: false });

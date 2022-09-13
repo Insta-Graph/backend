@@ -9,8 +9,6 @@ export default class PostResolver {
   @Mutation(() => Post)
   async createPost(@Arg('input', () => PostCreateInput) input: PostCreateInput) {
     const id = uuidv4();
-    // eslint-disable-next-line no-console
-    console.log(id);
     const newPost = await Post.create({ _id: id, text: input.text, title: input.title }).save();
     return newPost;
   }

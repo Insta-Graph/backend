@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-yarn exec pretty-quick --staged && yarn exec concurrently yarn:lint yarn:check-types
+yarn exec pretty-quick --staged && yarn exec concurrently yarn:test:ci yarn:lint yarn:check-types

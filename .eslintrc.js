@@ -1,8 +1,8 @@
 module.exports = {
   env: {
-    browser: true,
-    commonjs: true,
+    node: true,
     es2021: true,
+    jest: true,
   },
   extends: [
     'airbnb-base',
@@ -26,14 +26,29 @@ module.exports = {
       },
     ],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_+' }],
-    'object-curly-newline': 'off',
+    'object-curly-newline': [
+      'error',
+      {
+        ObjectExpression: { consistent: true, multiline: true },
+        ObjectPattern: { consistent: true, multiline: true },
+        ImportDeclaration: 'never',
+        ExportDeclaration: { multiline: true, minProperties: 3 },
+      },
+    ],
     indent: ['error', 2, { ignoredNodes: ['PropertyDefinition'] }],
     'class-methods-use-this': 'off',
     'import/extensions': 'off',
     'comma-dangle': 'off',
     'no-underscore-dangle': 'off',
     'implicit-arrow-linebreak': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_next$' }],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_*' }],
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        devDependencies: ['**/*.test.js', '**/*.test.ts', '**/mocked_data/*.ts'],
+      },
+    ],
   },
   settings: {
     'import/resolver': {
