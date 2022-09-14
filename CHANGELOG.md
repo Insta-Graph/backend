@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Insta-Graph/backend/compare/v1.0.0...v1.1.0) (2022-09-14)
+
+
+### Features
+
+* add posts resolver and testing ([3268a3a](https://github.com/Insta-Graph/backend/commit/3268a3a67077e581cb4762eb7f3c4f27cae1f3c2))
+
 # 1.0.0 (2022-09-10)
 
 
