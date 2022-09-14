@@ -54,7 +54,7 @@
     "@types/node": "^18.7.17",
     "@types/sinon": "^10.0.13",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.19.0",
     "concurrently": "^6.2.1",
     "eslint": "^8.13.0",
