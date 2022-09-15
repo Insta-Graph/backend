@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Insta-Graph/backend/compare/v1.2.0...v1.2.1) (2022-09-15)
+
+
+### Bug Fixes
+
+* use scoped containers when testing resolvers ([66340ba](https://github.com/Insta-Graph/backend/commit/66340baaf95d8245212c83762231e8f6cd9d0d24))
+
 # [1.2.0](https://github.com/Insta-Graph/backend/compare/v1.1.0...v1.2.0) (2022-09-15)
 
 
