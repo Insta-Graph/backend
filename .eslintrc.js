@@ -6,6 +6,7 @@ module.exports = {
   },
   extends: [
     'airbnb-base',
+    'prettier',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
@@ -18,23 +19,8 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'prettier'],
   rules: {
-    'prettier/prettier': [
-      1,
-      {
-        trailingComma: 'es5',
-        singleQuote: true,
-      },
-    ],
+    'prettier/prettier': 'error',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_+' }],
-    'object-curly-newline': [
-      'error',
-      {
-        ObjectExpression: { consistent: true, multiline: true },
-        ObjectPattern: { consistent: true, multiline: true },
-        ImportDeclaration: 'never',
-        ExportDeclaration: { multiline: true, minProperties: 3 },
-      },
-    ],
     indent: ['error', 2, { ignoredNodes: ['PropertyDefinition'] }],
     'class-methods-use-this': 'off',
     'import/extensions': 'off',

@@ -1,2 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export { default as PostResolver } from './PostResolver';
+export { default as UserResolver } from './UserResolver';
+export { default as AuthResolver } from './AuthResolver';

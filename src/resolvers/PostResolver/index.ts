@@ -1,9 +1,11 @@
 import { ObjectID } from 'typeorm';
 import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql';
 import { v4 as uuidv4 } from 'uuid';
+import { Service } from 'typedi';
 import Post from '../../entity/Post';
 import { PostCreateInput, PostUpdateInput } from './input';
 
+@Service()
 @Resolver()
 export default class PostResolver {
   @Mutation(() => Post)

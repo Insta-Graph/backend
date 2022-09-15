@@ -1,10 +1,8 @@
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { HttpError } from '../types/api';
 import secret, { TOKEN_EXPIRATION, TOKEN_REFRESH_EXPIRATION } from '../constants';
-import User from '../models/user';
 import RefreshToken from '../models/refreshToken';
 
 const generateTokens = (userId: string) => {
@@ -13,68 +11,68 @@ const generateTokens = (userId: string) => {
   return { accessToken, refreshToken };
 };
 
-export const register = asyncHandler(async (req, res, _next) => {
-  const { email, fullName, password } = req.body;
-  if (!email || !fullName || !password) {
-    throw new HttpError(400, 'Bad data');
-  }
-  const user = await User.findOne({ email });
-  if (user) {
-    throw new HttpError(400, 'User already exists');
-  }
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(password, salt);
-  const newUser = await User.create({ email, fullName, password: hashedPassword });
+// export const register = asyncHandler(async (req, res, _next) => {
+//   const { email, fullName, password } = req.body;
+//   if (!email || !fullName || !password) {
+//     throw new HttpError(400, 'Bad data');
+//   }
+//   const user = await User.findOne({ email });
+//   if (user) {
+//     throw new HttpError(400, 'User already exists');
+//   }
+//   const salt = bcrypt.genSaltSync(10);
+//   const hashedPassword = bcrypt.hashSync(password, salt);
+//   const newUser = await User.create({ email, fullName, password: hashedPassword });
 
-  if (newUser) {
-    const { accessToken, refreshToken } = generateTokens(newUser._id);
-    // save refresh token
-    RefreshToken.create({
-      user: newUser._id,
-      token: refreshToken,
-      expires: Date.now() + TOKEN_REFRESH_EXPIRATION * 1000,
-    });
+//   if (newUser) {
+//     const { accessToken, refreshToken } = generateTokens(newUser._id);
+//     // save refresh token
+//     RefreshToken.create({
+//       user: newUser._id,
+//       token: refreshToken,
+//       expires: Date.now() + TOKEN_REFRESH_EXPIRATION * 1000,
+//     });
 
-    res.status(201).json({
-      email: newUser.email,
-      id: newUser._id,
-      fullName: newUser.fullName,
-      accessToken,
-      refreshToken,
-    });
-  }
-  throw new HttpError(400, 'invalid user data');
-});
+//     res.status(201).json({
+//       email: newUser.email,
+//       id: newUser._id,
+//       fullName: newUser.fullName,
+//       accessToken,
+//       refreshToken,
+//     });
+//   }
+//   throw new HttpError(400, 'invalid user data');
+// });
 
-export const login = asyncHandler(async (req, res, _next) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new HttpError(400, 'User does not exist');
-  }
+// export const login = asyncHandler(async (req, res, _next) => {
+//   const { email, password } = req.body;
+//   const user = await User.findOne({ email });
+//   if (!user) {
+//     throw new HttpError(400, 'User does not exist');
+//   }
 
-  const isPasswordValid = bcrypt.compareSync(password, user.password);
+//   const isPasswordValid = bcrypt.compareSync(password, user.password);
 
-  if (!isPasswordValid) {
-    throw new HttpError(400, 'Invalid password');
-  }
-  const { accessToken, refreshToken } = generateTokens(user._id);
+//   if (!isPasswordValid) {
+//     throw new HttpError(400, 'Invalid password');
+//   }
+//   const { accessToken, refreshToken } = generateTokens(user._id);
 
-  // save refresh token
-  RefreshToken.create({
-    user: user._id,
-    token: refreshToken,
-    expires: Date.now() + TOKEN_REFRESH_EXPIRATION * 1000,
-  });
+//   // save refresh token
+//   RefreshToken.create({
+//     user: user._id,
+//     token: refreshToken,
+//     expires: Date.now() + TOKEN_REFRESH_EXPIRATION * 1000,
+//   });
 
-  res.status(200).json({
-    id: user._id,
-    fullName: user.fullName,
-    email: user.email,
-    accessToken,
-    refreshToken,
-  });
-});
+//   res.status(200).json({
+//     id: user._id,
+//     fullName: user.fullName,
+//     email: user.email,
+//     accessToken,
+//     refreshToken,
+//   });
+// });
 
 export const refreshTokenHandler = asyncHandler(async (req, res, _next) => {
   const {

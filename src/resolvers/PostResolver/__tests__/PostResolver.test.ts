@@ -1,8 +1,8 @@
-import { createEntityMock, gCall } from 'utils/graph';
 import { faker } from '@faker-js/faker';
 import sinon from 'sinon';
 import Post from 'entity/Post';
-import { MOCKED_POST, MOCKED_POST_ID, MOCKED_POSTS } from '../../../mocked_data/post';
+import { createEntityMock, gCall } from 'mocked_data/utils';
+import { MOCKED_POST, MOCKED_POST_ID, MOCKED_POSTS } from 'mocked_data/post';
 
 describe('Post Resolver', () => {
   const postModel = sinon.createStubInstance(Post);
