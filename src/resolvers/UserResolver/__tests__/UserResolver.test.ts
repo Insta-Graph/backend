@@ -8,8 +8,9 @@ import {
   userRepositoryMocks,
   userRepositoryUnsuccessfullyMocks,
 } from 'mocked_data/user';
-import { setupTestingContainer, gCall } from 'mocked_data/utils';
+import { gCallWithRepositoryMock } from 'mocked_data/utils';
 import Container from 'typedi';
+import { v4 as uuidv4 } from 'uuid';
 
 const registerUserMutation = `
       mutation RegisterUser($data: UserCreateInput!) {
@@ -40,21 +41,19 @@ const registerUserMutation = `
     `;
 
 describe('User Resolver', () => {
-  beforeEach(() => {
-    Container.reset();
-  });
-
   it('registerUser', async () => {
-    setupTestingContainer({
-      methodToMock: userRepositoryMocks.registerUser,
-      entityName: User.name,
-    });
+    const containerId = uuidv4();
 
-    const response = await gCall({
+    const response = await gCallWithRepositoryMock({
       source: registerUserMutation,
       variableValues: {
         data: { ...MOCKED_REGISTER },
       },
+      repositoryMockedData: {
+        methodToMock: userRepositoryMocks.registerUser,
+        entityName: User.name,
+      },
+      containerId,
     });
 
     expect(response).toMatchObject({
@@ -65,19 +64,22 @@ describe('User Resolver', () => {
       },
     });
     expect(response.data?.registerUser).toHaveProperty('auth');
+    Container.reset(containerId);
   });
 
   it('should not create user when already exists', async () => {
-    setupTestingContainer({
-      methodToMock: userRepositoryUnsuccessfullyMocks.registerUser,
-      entityName: User.name,
-    });
+    const containerId = uuidv4();
 
-    const response = await gCall({
+    const response = await gCallWithRepositoryMock({
       source: registerUserMutation,
       variableValues: {
         data: { ...MOCKED_REGISTER },
       },
+      repositoryMockedData: {
+        methodToMock: userRepositoryUnsuccessfullyMocks.registerUser,
+        entityName: User.name,
+      },
+      containerId,
     });
 
     expect(response).toMatchObject({
@@ -85,13 +87,11 @@ describe('User Resolver', () => {
         registerUser: { success: false, message: 'user already exists' },
       },
     });
+    Container.reset(containerId);
   });
 
   it('updateUser', async () => {
-    setupTestingContainer({
-      methodToMock: userRepositoryMocks.updateUser,
-      entityName: User.name,
-    });
+    const containerId = uuidv4();
 
     const updateUserMutation = `
       mutation UpdateUser($data: UserUpdateInput!, $id: ID!) {
@@ -112,12 +112,17 @@ describe('User Resolver', () => {
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
     };
-    const response = await gCall({
+    const response = await gCallWithRepositoryMock({
       source: updateUserMutation,
       variableValues: {
         id: MOCKED_USER_ID,
         data: updatedUser,
       },
+      repositoryMockedData: {
+        methodToMock: userRepositoryMocks.updateUser,
+        entityName: User.name,
+      },
+      containerId,
     });
 
     expect(response).toMatchObject({
@@ -128,13 +133,11 @@ describe('User Resolver', () => {
         },
       },
     });
+    Container.reset(containerId);
   });
 
   it('getUsers', async () => {
-    setupTestingContainer({
-      methodToMock: userRepositoryMocks.getUsers,
-      entityName: User.name,
-    });
+    const containerId = uuidv4();
 
     const getUsersQuery = `
       query ExampleQuery {
@@ -149,8 +152,13 @@ describe('User Resolver', () => {
       }
     `;
 
-    const response = await gCall({
+    const response = await gCallWithRepositoryMock({
       source: getUsersQuery,
+      repositoryMockedData: {
+        methodToMock: userRepositoryMocks.getUsers,
+        entityName: User.name,
+      },
+      containerId,
     });
 
     expect(response).toMatchObject({
@@ -158,13 +166,11 @@ describe('User Resolver', () => {
         getUsers: [...MOCKED_USERS],
       },
     });
+    Container.reset(containerId);
   });
 
   it('getUserById', async () => {
-    setupTestingContainer({
-      methodToMock: userRepositoryMocks.getUserById,
-      entityName: User.name,
-    });
+    const containerId = uuidv4();
 
     const getUserByIdQuery = `
       query GetUserById($id: ID!){
@@ -179,11 +185,16 @@ describe('User Resolver', () => {
       }
     `;
 
-    const response = await gCall({
+    const response = await gCallWithRepositoryMock({
       source: getUserByIdQuery,
       variableValues: {
         id: MOCKED_USER_ID,
       },
+      repositoryMockedData: {
+        methodToMock: userRepositoryMocks.getUserById,
+        entityName: User.name,
+      },
+      containerId,
     });
 
     expect(response).toMatchObject({
@@ -191,5 +202,6 @@ describe('User Resolver', () => {
         getUserById: MOCKED_REGISTERED_USER,
       },
     });
+    Container.reset(containerId);
   });
 });

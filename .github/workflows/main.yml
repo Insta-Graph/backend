@@ -25,12 +25,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Run linter
-        run: yarn lint
-      - name: Check types
-        run: yarn check-types
       - name: Run the tests and generate coverage report
-        run: yarn test:ci
+        run: yarn exec concurrently yarn:test:ci yarn:lint yarn:check-types
 
   release:
     name: Run semantic release

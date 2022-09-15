@@ -10,8 +10,7 @@ import { DataSource } from 'typeorm';
 import { createSchema, setupContainer, formatError } from './utils/graph';
 import errorMiddleware from './middleware/error';
 
-// eslint-disable-next-line import/prefer-default-export
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
   type: 'mongodb',
   url: `mongodb://${process.env.DB_USER ?? 'admin'}:${
     process.env.DB_PASSWORD ?? 'password'

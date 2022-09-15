@@ -1,39 +1,68 @@
-import { GraphQLSchema, graphql } from 'graphql';
+import { graphql, GraphQLSchema } from 'graphql';
 import sinon from 'sinon';
-import Container from 'typedi';
+import Container, { ContainerInstance } from 'typedi';
 import { Repository } from 'typeorm';
 import { createSchema } from '../utils/graph';
 import { MockRepositoryMethod } from '../types/graph';
 
+interface SetupRepositoryMock {
+  methodToMock: MockRepositoryMethod;
+  entityName: string;
+  container: ContainerInstance;
+}
+
 export const setupTestingContainer = ({
   methodToMock,
   entityName,
-}: {
-  methodToMock: MockRepositoryMethod;
-  entityName: string;
-}): void => {
+  container,
+}: SetupRepositoryMock): void => {
   const fakeRepository = sinon.createStubInstance(Repository);
   methodToMock(fakeRepository);
-  Container.set({ id: `${entityName}_Repository`, value: fakeRepository });
+  container.set({ id: `${entityName}_Repository`, value: fakeRepository });
 };
 
 interface Options {
   source: string;
   variableValues?: { [key: string]: unknown };
-  methodToMock?: string;
+  containerId: string;
+  repositoryMockedData: Omit<SetupRepositoryMock, 'container'>;
 }
 
-let schema: GraphQLSchema;
+let gCallSchema: GraphQLSchema;
 
-export const gCall = async ({ source, variableValues }: Options) => {
-  if (!schema) {
-    schema = await createSchema();
+export const gCall = async ({
+  source,
+  variableValues,
+}: Omit<Options, 'containerId' | 'repositoryMockedData'>) => {
+  if (!gCallSchema) {
+    gCallSchema = await createSchema();
   }
   return graphql({
+    schema: gCallSchema,
+    source,
+    variableValues,
+  });
+};
+
+export const gCallWithRepositoryMock = async ({
+  source,
+  variableValues,
+  containerId,
+  repositoryMockedData,
+}: Options) => {
+  const container = Container.of(containerId);
+
+  const schema = await createSchema(container);
+
+  setupTestingContainer({ ...repositoryMockedData, container });
+
+  const result = graphql({
     schema,
     source,
     variableValues,
   });
+
+  return result;
 };
 
 export const createEntityMock = <T>(args: T) => ({
