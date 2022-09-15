@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Insta-Graph/backend/compare/v1.1.0...v1.2.0) (2022-09-15)
+
+
+### Features
+
+* create authentication resolvers ([7c7bf58](https://github.com/Insta-Graph/backend/commit/7c7bf585adb3f21f58d426dccbdb4abae468ba1f))
+
 # [1.1.0](https://github.com/Insta-Graph/backend/compare/v1.0.0...v1.1.0) (2022-09-14)
 
 
