@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Test micro frontend utility
+    name: Test backend project
     runs-on: ubuntu-latest
     strategy:
       matrix:

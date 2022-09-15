@@ -6,6 +6,7 @@
     "typeRoots": ["./src/types", "node_modules/@types"],
     "types": ["jest", "node"],
     "target": "es2018",
+    "outDir": "./dist",
     "baseUrl": "src/",
     "allowJs": true,
     "incremental": true,

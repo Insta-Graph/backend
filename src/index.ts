@@ -1,48 +1,48 @@
 /* eslint-disable no-console */
 import 'reflect-metadata';
 import express from 'express';
-import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cors from 'cors';
 import compress from 'compression';
 import { ApolloServer } from 'apollo-server-express';
-import { buildSchema } from 'type-graphql';
-import formatError from './utils/error';
-import { PostResolver } from './resolvers';
-import taskRouter from './routes/tasks';
-import authRouter from './routes/auth';
+import { DataSource } from 'typeorm';
+import { createSchema, setupContainer, formatError } from './utils/graph';
 import errorMiddleware from './middleware/error';
 
-async function startMongo() {
-  try {
-    const connection = new DataSource({
-      type: 'mongodb',
-      url: `mongodb://${process.env.DB_USER ?? 'admin'}:${
-        process.env.DB_PASSWORD ?? 'password'
-      }@db:27017/todo?authSource=admin`,
-      useNewUrlParser: true,
-      synchronize: true,
-      logging: true,
-      entities: ['src/entity/**/*.ts'],
-      subscribers: ['src/subscriber/**/*.ts'],
-      migrations: ['src/migration/**/*.ts'],
-    });
+// eslint-disable-next-line import/prefer-default-export
+export const AppDataSource = new DataSource({
+  type: 'mongodb',
+  url: `mongodb://${process.env.DB_USER ?? 'admin'}:${
+    process.env.DB_PASSWORD ?? 'password'
+  }@db:27017/todo?authSource=admin`,
+  useNewUrlParser: true,
+  synchronize: true,
+  logging: true,
+  entities: ['src/entity/**/*.ts'],
+  subscribers: ['src/subscriber/**/*.ts'],
+  migrations: ['src/migration/**/*.ts'],
+});
 
-    await connection.initialize();
-    console.log('MONGO CONNECTED');
+const connectToDatabase = async () => {
+  try {
+    await AppDataSource.initialize();
+    console.log('MongoDB Connected');
   } catch (error) {
-    console.log('MONGO ERROR');
+    console.log('MongoDB Connection Error');
     console.log(error);
+    console.log(JSON.stringify(error));
   }
-}
+};
 
 (async () => {
   dotenv.config();
 
   const app = express();
 
-  startMongo();
+  setupContainer(AppDataSource);
+
+  await connectToDatabase();
 
   app.use(compress());
 
@@ -67,14 +67,8 @@ async function startMongo() {
 
   app.use(express.urlencoded({ extended: false }));
 
-  app.use('/api/v1/task', taskRouter);
-  app.use('/api/v1/auth', authRouter);
-
   const apolloServer = new ApolloServer({
-    schema: await buildSchema({
-      resolvers: [PostResolver],
-      validate: true,
-    }),
+    schema: await createSchema(),
     context: ({ req, res }) => ({ req, res }),
     formatError,
   });
