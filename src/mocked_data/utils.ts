@@ -24,6 +24,7 @@ export const setupTestingContainer = ({
 interface Options {
   source: string;
   variableValues?: { [key: string]: unknown };
+  contextValue?: object;
   containerId: string;
   repositoryMockedData: Omit<SetupRepositoryMock, 'container'>;
 }
@@ -47,6 +48,7 @@ export const gCall = async ({
 export const gCallWithRepositoryMock = async ({
   source,
   variableValues,
+  contextValue,
   containerId,
   repositoryMockedData,
 }: Options) => {
@@ -56,12 +58,22 @@ export const gCallWithRepositoryMock = async ({
 
   setupTestingContainer({ ...repositoryMockedData, container });
 
-  const result = graphql({
-    schema,
-    source,
-    variableValues,
-  });
+  let result: ReturnType<typeof graphql>;
 
+  if (contextValue) {
+    result = graphql({
+      schema,
+      source,
+      variableValues,
+      contextValue,
+    });
+  } else {
+    result = graphql({
+      schema,
+      source,
+      variableValues,
+    });
+  }
   return result;
 };
 

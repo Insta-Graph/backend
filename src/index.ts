@@ -7,8 +7,11 @@ import cors from 'cors';
 import compress from 'compression';
 import { ApolloServer } from 'apollo-server-express';
 import { DataSource } from 'typeorm';
-import { createSchema, setupContainer, formatError } from './utils/graph';
+import cookieParser from 'cookie-parser';
+import Container from 'typedi';
+import RefreshTokenService from './middleware/refreshToken';
 import errorMiddleware from './middleware/error';
+import { createSchema, setupContainer, formatError } from './utils/graph';
 
 const AppDataSource = new DataSource({
   type: 'mongodb',
@@ -62,6 +65,8 @@ const connectToDatabase = async () => {
 
   app.use(cors());
 
+  app.use(cookieParser());
+
   app.use(express.json());
 
   app.use(express.urlencoded({ extended: false }));
@@ -75,6 +80,9 @@ const connectToDatabase = async () => {
   apolloServer.applyMiddleware({ app, cors: false });
 
   const port = 5000;
+
+  app.post('/refresh-token', Container.get(RefreshTokenService).refreshToken);
+
   app.get('/', (_, res) => {
     res.status(200).send('<h1>Here</h1>');
   });
