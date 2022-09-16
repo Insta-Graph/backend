@@ -5,9 +5,6 @@ export default class TokenData {
   @Field()
   accessToken: string;
 
-  @Field()
-  refreshToken: string;
-
   @Field(() => Int)
   expiresIn: number;
 }

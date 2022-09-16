@@ -1,8 +1,10 @@
 import { ObjectID, Repository } from 'typeorm';
-import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, ID, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { v4 as uuidv4 } from 'uuid';
 import argon2 from 'argon2';
 import { Service, Inject } from 'typedi';
+import { CustomContext } from '../../types/graph';
+import isAuthenticated from '../../middleware/auth';
 import { AuthResponseUnion } from '../AuthResolver/types';
 import { generateTokens } from '../../utils/auth';
 import User from '../../entity/User';
@@ -16,7 +18,8 @@ export default class UserResolver {
 
   @Mutation(() => AuthResponseUnion)
   async registerUser(
-    @Arg('input', () => UserCreateInput) input: UserCreateInput
+    @Arg('input', () => UserCreateInput) input: UserCreateInput,
+    @Ctx() { res }: CustomContext
   ): Promise<typeof AuthResponseUnion> {
     const user = await this.repository.findOneBy({ email: input.email });
 
@@ -38,20 +41,24 @@ export default class UserResolver {
     });
 
     await this.repository.save(newUser);
-    const tokenData = generateTokens(newUser._id.toString());
+    const { accessToken, refreshToken, expiresIn } = generateTokens(newUser._id.toString());
+    res.cookie('pub', refreshToken, { httpOnly: true });
     return {
       user: { ...newUser },
-      auth: { ...tokenData },
+      auth: { accessToken, expiresIn },
     };
   }
 
   @Mutation(() => User)
+  @UseMiddleware(isAuthenticated)
   async updateUser(
-    @Arg('id', () => ID) id: ObjectID,
-    @Arg('options', () => UserUpdateInput) options: UserUpdateInput
+    @Arg('options', () => UserUpdateInput) options: UserUpdateInput,
+    @Ctx() { payload }: CustomContext
   ) {
-    const oldUser = await this.repository.findOneByOrFail({ _id: id });
-    await this.repository.update({ _id: id }, options);
+    const _id = (payload?.userId ?? '') as unknown as ObjectID;
+
+    const oldUser = await this.repository.findOneByOrFail({ _id });
+    await this.repository.update({ _id }, options);
     return { ...oldUser, ...options };
   }
 

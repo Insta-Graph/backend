@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
 
 export type ExtractFunctionKeys<T> = {
@@ -12,3 +13,9 @@ export type MockRepositoryMethod = (
 export type RepositoryMock<T extends string> = {
   [key in T]: MockRepositoryMethod;
 };
+
+export interface CustomContext {
+  req: Request;
+  res: Response;
+  payload?: { userId: string };
+}

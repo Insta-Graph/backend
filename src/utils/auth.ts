@@ -1,11 +1,21 @@
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import secret, { TOKEN_EXPIRATION } from '../constants';
+import {
+  ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET,
+  TOKEN_EXPIRATION,
+  TOKEN_REFRESH_EXPIRATION,
+} from '../constants';
 
-// eslint-disable-next-line import/prefer-default-export
-export const generateTokens = (userId: string) => {
-  const expiration = { expiresIn: TOKEN_EXPIRATION };
-  const accessToken = jwt.sign({ id: userId }, secret, { ...expiration });
-  const refreshToken = crypto.randomBytes(40).toString('hex');
-  return { accessToken, refreshToken, expiresIn: expiration.expiresIn };
-};
+export const generateAccessToken = (userId: string) =>
+  jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, { expiresIn: TOKEN_EXPIRATION });
+
+export const generateRefreshToken = (userId: string) =>
+  jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
+    expiresIn: TOKEN_REFRESH_EXPIRATION,
+  });
+
+export const generateTokens = (userId: string) => ({
+  accessToken: generateAccessToken(userId),
+  refreshToken: generateRefreshToken(userId),
+  expiresIn: TOKEN_EXPIRATION,
+});

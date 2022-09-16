@@ -3,10 +3,14 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { Container, ContainerInstance } from 'typedi';
 import { DataSource } from 'typeorm';
 import { ApolloError } from 'apollo-server-express';
+import { HttpError } from '../types/api';
 import { AuthResolver, PostResolver, UserResolver } from '../resolvers';
 import { ENTITIES } from '../constants';
 
 export const formatError = (error: GraphQLError): GraphQLFormattedError => {
+  // eslint-disable-next-line no-param-reassign
+  delete error.extensions?.exception?.stacktrace;
+
   if (error.originalError instanceof ApolloError) {
     return error;
   }
@@ -16,8 +20,6 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
 
     // eslint-disable-next-line no-param-reassign
     error.extensions.code = 'GRAPHQL_VALIDATION_FAILED';
-    // eslint-disable-next-line no-param-reassign
-    delete error.extensions.exception.stacktrace;
 
     return {
       message,
@@ -27,8 +29,10 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
     };
   }
 
-  // eslint-disable-next-line no-param-reassign
-  error.message = 'Internal Server Error';
+  if (!(error.originalError instanceof HttpError)) {
+    // eslint-disable-next-line no-param-reassign
+    error.message = 'Internal Server Error';
+  }
 
   return error;
 };
