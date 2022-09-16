@@ -22,7 +22,7 @@ const registerUserMutation = `
         registerUser(
           input: $data
         ) {
-          ... on ErrorResponse {
+          ... on ResponseStatus {
             success
             message
           }
@@ -96,6 +96,8 @@ describe('User Resolver', () => {
     expect(mockedExpressResponse.cookies.pub).toBeDefined();
     expect(mockedExpressResponse.cookies.pub).toHaveProperty('value');
     expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.httpOnly', true);
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.path', '/refresh-token');
+
     Container.reset(containerId);
   });
 

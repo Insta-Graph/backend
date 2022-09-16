@@ -18,13 +18,22 @@ export default class RefreshTokenService {
 
       if (refreshToken) {
         const decoded = verify(refreshToken, REFRESH_TOKEN_SECRET);
-        const id = typeof decoded === 'string' ? decoded : decoded.id;
+
+        if (typeof decoded === 'string') {
+          throw new HttpError(401, 'invalid token');
+        }
+        const { id, tokenVersion } = decoded;
 
         const user = await this.repository.findOneBy({ _id: id });
 
         if (!user) {
           throw new HttpError(401, 'user does not exist');
         }
+
+        if (user.tokenVersion !== tokenVersion) {
+          throw new HttpError(401, 'invalid token');
+        }
+
         const accessToken = generateAccessToken(id);
         res.status(200).json({ accessToken, expiresIn: TOKEN_EXPIRATION });
         return;

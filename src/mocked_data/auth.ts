@@ -15,10 +15,16 @@ export const authRepositorySuccessfulMocks: RepositoryMock<MyActions> = {
       ...MOCKED_REGISTERED_USER,
     });
   },
+  logout: (repositoryStub) => {
+    repositoryStub.increment.resolves();
+  },
 };
 
 export const authRepositoryUnsuccessfullyMocks: RepositoryMock<MyActions> = {
   login: (repositoryStub) => {
     repositoryStub.findOneBy.resolves(null);
+  },
+  logout: (repositoryStub) => {
+    repositoryStub.increment.resolves();
   },
 };

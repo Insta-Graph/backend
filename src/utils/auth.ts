@@ -9,13 +9,13 @@ import {
 export const generateAccessToken = (userId: string) =>
   jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, { expiresIn: TOKEN_EXPIRATION });
 
-export const generateRefreshToken = (userId: string) =>
-  jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
+export const generateRefreshToken = (userId: string, tokenVersion: number) =>
+  jwt.sign({ id: userId, tokenVersion }, REFRESH_TOKEN_SECRET, {
     expiresIn: TOKEN_REFRESH_EXPIRATION,
   });
 
-export const generateTokens = (userId: string) => ({
+export const generateTokens = (userId: string, tokenVersion: number) => ({
   accessToken: generateAccessToken(userId),
-  refreshToken: generateRefreshToken(userId),
+  refreshToken: generateRefreshToken(userId, tokenVersion),
   expiresIn: TOKEN_EXPIRATION,
 });

@@ -41,8 +41,13 @@ export default class UserResolver {
     });
 
     await this.repository.save(newUser);
-    const { accessToken, refreshToken, expiresIn } = generateTokens(newUser._id.toString());
-    res.cookie('pub', refreshToken, { httpOnly: true });
+
+    const { accessToken, refreshToken, expiresIn } = generateTokens(
+      newUser._id.toString(),
+      newUser.tokenVersion
+    );
+
+    res.cookie('pub', refreshToken, { httpOnly: true, path: '/refresh-token' });
     return {
       user: { ...newUser },
       auth: { accessToken, expiresIn },
