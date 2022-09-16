@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Insta-Graph/backend/compare/v1.2.1...v1.3.0) (2022-09-16)
+
+
+### Features
+
+* refresh token and auth middleware ([297df81](https://github.com/Insta-Graph/backend/commit/297df81d95b67647c210b9b49b357c14acffe286))
+
 ## [1.2.1](https://github.com/Insta-Graph/backend/compare/v1.2.0...v1.2.1) (2022-09-15)
 
 
