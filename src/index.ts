@@ -63,7 +63,12 @@ const connectToDatabase = async () => {
     app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
   }
 
-  app.use(cors());
+  app.use(
+    cors({
+      origin: 'http://localhost:3002',
+      credentials: true,
+    })
+  );
 
   app.use(cookieParser());
 

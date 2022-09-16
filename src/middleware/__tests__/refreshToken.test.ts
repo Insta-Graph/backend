@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import { Container } from 'typedi';
 import { Repository } from 'typeorm';
 import httpMocks from 'node-mocks-http';
-import { MOCKED_REGISTERED_USER, MOCKED_USER_ID } from 'mocked_data/user';
+import { MOCKED_REGISTERED_USER_WITH_TOKEN, MOCKED_USER_ID } from 'mocked_data/user';
 import { generateRefreshToken } from 'utils/auth';
 import { v4 as uuidv4 } from 'uuid';
 import { asyncHandlerUtil } from 'utils/testsUtils';
@@ -17,11 +17,11 @@ describe('refreshToken', () => {
     const containerId = uuidv4();
     const container = Container.of(containerId);
     const fakeRepository = sinon.createStubInstance(Repository);
-    fakeRepository.findOneBy.resolves(MOCKED_REGISTERED_USER);
+    fakeRepository.findOneBy.resolves(MOCKED_REGISTERED_USER_WITH_TOKEN);
 
     const next = sinon.stub() as unknown as NextFunction;
 
-    const signedRefreshToken = generateRefreshToken(MOCKED_USER_ID);
+    const signedRefreshToken = generateRefreshToken(MOCKED_USER_ID, 0);
 
     const mockedExpressRequest = httpMocks.createRequest({ cookies: { pub: signedRefreshToken } });
     const mockedExpressResponse = httpMocks.createResponse();
@@ -53,7 +53,7 @@ describe('refreshToken', () => {
 
     const next = jest.fn();
 
-    const signedRefreshToken = generateRefreshToken(MOCKED_USER_ID);
+    const signedRefreshToken = generateRefreshToken(MOCKED_USER_ID, 0);
 
     const mockedExpressRequest = httpMocks.createRequest({ cookies: { pub: signedRefreshToken } });
     const mockedExpressResponse = httpMocks.createResponse();
@@ -156,6 +156,33 @@ describe('refreshToken', () => {
 
     expect(next).toBeCalled();
     expect(next).toBeCalledWith(new HttpError(401, 'token has expired'));
+    Container.reset(containerId);
+  });
+
+  it('should reject when token has been revoked', async () => {
+    const containerId = uuidv4();
+    const container = Container.of(containerId);
+    const fakeRepository = sinon.createStubInstance(Repository);
+    fakeRepository.findOneBy.resolves({ ...MOCKED_REGISTERED_USER_WITH_TOKEN, tokenVersion: 1 });
+
+    const next = jest.fn();
+
+    const signedRefreshToken = generateRefreshToken(MOCKED_USER_ID, 0);
+
+    const mockedExpressRequest = httpMocks.createRequest({ cookies: { pub: signedRefreshToken } });
+    const mockedExpressResponse = httpMocks.createResponse();
+
+    container.set({ id: `User_Repository`, value: fakeRepository });
+
+    const tokenService = container.get(RefreshTokenService);
+
+    await asyncHandlerUtil(tokenService.refreshToken)(
+      mockedExpressRequest,
+      mockedExpressResponse,
+      next
+    );
+
+    expect(next).toBeCalledWith(new HttpError(401, 'invalid token'));
     Container.reset(containerId);
   });
 

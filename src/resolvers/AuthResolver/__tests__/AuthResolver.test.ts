@@ -1,5 +1,5 @@
 import User from 'entity/User';
-import { MOCKED_REGISTERED_USER } from 'mocked_data/user';
+import { MOCKED_REGISTERED_USER, MOCKED_USER_ID } from 'mocked_data/user';
 import { gCallWithRepositoryMock } from 'mocked_data/utils';
 import Container from 'typedi';
 import argon2 from 'argon2';
@@ -12,6 +12,7 @@ import {
   authRepositoryUnsuccessfullyMocks,
   MOCKED_LOGIN,
 } from 'mocked_data/auth';
+import { generateAccessToken } from 'utils/auth';
 
 describe('Auth Resolver', () => {
   const argonStub = sinon.stub(argon2);
@@ -24,7 +25,7 @@ describe('Auth Resolver', () => {
         login(
           input: $data
         ) {
-          ... on ErrorResponse {
+          ... on ResponseStatus {
             success
             message
           }
@@ -77,6 +78,7 @@ describe('Auth Resolver', () => {
     expect(mockedExpressResponse.cookies.pub).toBeDefined();
     expect(mockedExpressResponse.cookies.pub).toHaveProperty('value');
     expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.httpOnly', true);
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.path', '/refresh-token');
 
     Container.reset(containerId);
   });
@@ -90,7 +92,7 @@ describe('Auth Resolver', () => {
         login(
           input: $data
         ) {
-          ... on ErrorResponse {
+          ... on ResponseStatus {
             success
             message
           }
@@ -146,7 +148,7 @@ describe('Auth Resolver', () => {
         login(
           input: $data
         ) {
-          ... on ErrorResponse {
+          ... on ResponseStatus {
             success
             message
           }
@@ -189,6 +191,58 @@ describe('Auth Resolver', () => {
       },
     });
     expect(mockedExpressResponse.cookies.pub).not.toBeDefined();
+
+    Container.reset(containerId);
+  });
+
+  it('should logout user', async () => {
+    const logoutMutation = `
+      mutation Logout {
+        logout {
+          success
+          message
+        }
+      }
+    `;
+    const containerId = uuidv4();
+
+    const signedToken = generateAccessToken(MOCKED_USER_ID);
+
+    const mockedExpressRequest = httpMocks.createRequest({
+      headers: {
+        authorization: `Bearer ${signedToken}`,
+      },
+    });
+
+    const mockedExpressResponse = httpMocks.createResponse();
+
+    const response = await gCallWithRepositoryMock({
+      source: logoutMutation,
+      repositoryMockedData: {
+        methodToMock: authRepositorySuccessfulMocks.logout,
+        entityName: User.name,
+      },
+      containerId,
+      contextValue: {
+        req: mockedExpressRequest,
+
+        res: mockedExpressResponse,
+      },
+    });
+
+    expect(response).toMatchObject({
+      data: {
+        logout: {
+          success: true,
+          message: 'successfully logged out',
+        },
+      },
+    });
+
+    expect(mockedExpressResponse.cookies.pub).toBeDefined();
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('value', '');
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.httpOnly', true);
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.path', '/refresh-token');
 
     Container.reset(containerId);
   });
