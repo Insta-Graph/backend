@@ -4,6 +4,7 @@ import { gCallWithRepositoryMock } from 'mocked_data/utils';
 import Container from 'typedi';
 import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
+import httpMocks from 'node-mocks-http';
 
 import sinon from 'sinon';
 import {
@@ -15,7 +16,7 @@ import {
 describe('Auth Resolver', () => {
   const argonStub = sinon.stub(argon2);
 
-  xit('should login user', async () => {
+  it('should login user', async () => {
     argonStub.verify.resolves(true);
 
     const loginMutation = `
@@ -46,6 +47,8 @@ describe('Auth Resolver', () => {
     `;
     const containerId = uuidv4();
 
+    const mockedExpressResponse = httpMocks.createResponse();
+
     const response = await gCallWithRepositoryMock({
       source: loginMutation,
       variableValues: {
@@ -56,6 +59,9 @@ describe('Auth Resolver', () => {
         entityName: User.name,
       },
       containerId,
+      contextValue: {
+        res: mockedExpressResponse,
+      },
     });
 
     expect(response).toMatchObject({
@@ -66,12 +72,18 @@ describe('Auth Resolver', () => {
       },
     });
     expect(response.data?.login).toHaveProperty('auth');
+    expect(response.data?.login.auth).toHaveProperty('accessToken');
+    expect(response.data?.login.auth).toHaveProperty('expiresIn');
+    expect(mockedExpressResponse.cookies.pub).toBeDefined();
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('value');
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.httpOnly', true);
 
     Container.reset(containerId);
   });
 
-  xit('should reject login when user does not exist', async () => {
+  it('should reject login when user does not exist', async () => {
     const containerId = uuidv4();
+    const mockedExpressResponse = httpMocks.createResponse();
 
     const loginMutation = `
       mutation Login($data: LoginInput!) {
@@ -110,6 +122,9 @@ describe('Auth Resolver', () => {
         entityName: User.name,
       },
       containerId,
+      contextValue: {
+        res: mockedExpressResponse,
+      },
     });
 
     expect(response).toMatchObject({
@@ -117,12 +132,14 @@ describe('Auth Resolver', () => {
         login: { success: false, message: 'user does not exist' },
       },
     });
+    expect(mockedExpressResponse.cookies.pub).not.toBeDefined();
     Container.reset(containerId);
   });
 
-  xit('should reject when password does not match', async () => {
+  it('should reject when password does not match', async () => {
     argonStub.verify.resolves(false);
     const containerId = uuidv4();
+    const mockedExpressResponse = httpMocks.createResponse();
 
     const loginMutation = `
       mutation login($data: LoginInput!) {
@@ -161,6 +178,9 @@ describe('Auth Resolver', () => {
         entityName: User.name,
       },
       containerId,
+      contextValue: {
+        res: mockedExpressResponse,
+      },
     });
 
     expect(response).toMatchObject({
@@ -168,6 +188,8 @@ describe('Auth Resolver', () => {
         login: { success: false, message: 'password is incorrect' },
       },
     });
+    expect(mockedExpressResponse.cookies.pub).not.toBeDefined();
+
     Container.reset(containerId);
   });
 });

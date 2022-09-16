@@ -14,6 +14,7 @@ import Container from 'typedi';
 import { generateAccessToken } from 'utils/auth';
 import { v4 as uuidv4 } from 'uuid';
 import sinon from 'sinon';
+import httpMocks from 'node-mocks-http';
 import { ACCESS_TOKEN_SECRET } from '../../../constants';
 
 const registerUserMutation = `
@@ -59,8 +60,11 @@ const updateUserMutation = `
   `;
 
 describe('User Resolver', () => {
-  xit('registerUser', async () => {
+  it('registerUser', async () => {
     const containerId = uuidv4();
+
+    const mockedExpressRequest = httpMocks.createRequest();
+    const mockedExpressResponse = httpMocks.createResponse();
 
     const response = await gCallWithRepositoryMock({
       source: registerUserMutation,
@@ -72,7 +76,14 @@ describe('User Resolver', () => {
         entityName: User.name,
       },
       containerId,
+      contextValue: {
+        req: mockedExpressRequest,
+        res: mockedExpressResponse,
+      },
     });
+
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(response));
 
     expect(response).toMatchObject({
       data: {
@@ -82,11 +93,16 @@ describe('User Resolver', () => {
       },
     });
     expect(response.data?.registerUser).toHaveProperty('auth');
+    expect(mockedExpressResponse.cookies.pub).toBeDefined();
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('value');
+    expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.httpOnly', true);
     Container.reset(containerId);
   });
 
-  xit('should not create user when already exists', async () => {
+  it('should not create user when already exists', async () => {
     const containerId = uuidv4();
+    const mockedExpressRequest = httpMocks.createRequest();
+    const mockedExpressResponse = httpMocks.createResponse();
 
     const response = await gCallWithRepositoryMock({
       source: registerUserMutation,
@@ -98,6 +114,10 @@ describe('User Resolver', () => {
         entityName: User.name,
       },
       containerId,
+      contextValue: {
+        req: mockedExpressRequest,
+        res: mockedExpressResponse,
+      },
     });
 
     expect(response).toMatchObject({
@@ -119,6 +139,12 @@ describe('User Resolver', () => {
 
     const signedToken = generateAccessToken(MOCKED_USER_ID);
 
+    const mockedExpressRequest = httpMocks.createRequest({
+      headers: {
+        authorization: `Bearer ${signedToken}`,
+      },
+    });
+
     const response = await gCallWithRepositoryMock({
       source: updateUserMutation,
       variableValues: {
@@ -126,11 +152,7 @@ describe('User Resolver', () => {
         data: updatedUser,
       },
       contextValue: {
-        req: {
-          headers: {
-            authorization: `Bearer ${signedToken}`,
-          },
-        },
+        req: mockedExpressRequest,
       },
       repositoryMockedData: {
         methodToMock: userRepositoryMocks.updateUser,
@@ -159,6 +181,12 @@ describe('User Resolver', () => {
       lastName: faker.name.lastName(),
     };
 
+    const mockedExpressRequest = httpMocks.createRequest({
+      headers: {
+        authorization: `Bearer ${faker.datatype.uuid()}`,
+      },
+    });
+
     const response = await gCallWithRepositoryMock({
       source: updateUserMutation,
       variableValues: {
@@ -166,11 +194,7 @@ describe('User Resolver', () => {
         data: updatedUser,
       },
       contextValue: {
-        req: {
-          headers: {
-            authorization: `Bearer ${faker.datatype.uuid()}`,
-          },
-        },
+        req: mockedExpressRequest,
       },
       repositoryMockedData: {
         methodToMock: userRepositoryMocks.updateUser,
@@ -195,6 +219,8 @@ describe('User Resolver', () => {
       lastName: faker.name.lastName(),
     };
 
+    const mockedExpressRequest = httpMocks.createRequest();
+
     const response = await gCallWithRepositoryMock({
       source: updateUserMutation,
       variableValues: {
@@ -202,9 +228,7 @@ describe('User Resolver', () => {
         data: updatedUser,
       },
       contextValue: {
-        req: {
-          headers: {},
-        },
+        req: mockedExpressRequest,
       },
       repositoryMockedData: {
         methodToMock: userRepositoryMocks.updateUser,
@@ -233,6 +257,12 @@ describe('User Resolver', () => {
       expiresIn: '-1h',
     });
 
+    const mockedExpressRequest = httpMocks.createRequest({
+      headers: {
+        authorization: `Bearer ${expiredToken}`,
+      },
+    });
+
     const response = await gCallWithRepositoryMock({
       source: updateUserMutation,
       variableValues: {
@@ -240,11 +270,7 @@ describe('User Resolver', () => {
         data: updatedUser,
       },
       contextValue: {
-        req: {
-          headers: {
-            authorization: `Bearer ${expiredToken}`,
-          },
-        },
+        req: mockedExpressRequest,
       },
       repositoryMockedData: {
         methodToMock: userRepositoryMocks.updateUser,

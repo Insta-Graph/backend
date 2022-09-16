@@ -19,8 +19,6 @@ export default class AuthResolver {
     @Arg('input', () => LoginInput) input: LoginInput,
     @Ctx() { res }: CustomContext
   ): Promise<typeof AuthResponseUnion> {
-    // eslint-disable-next-line no-console
-    console.log('HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     const user = await this.repository.findOneBy({ email: input.email });
 
     if (!user) {
