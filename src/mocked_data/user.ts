@@ -5,7 +5,7 @@ import { ExtractFunctionKeys, RepositoryMock } from '../types/graph';
 
 export const MOCKED_EMAIL = faker.internet.email();
 
-export const MOCKED_PASSWORD = `${faker.internet.password()}/_`;
+export const MOCKED_PASSWORD = `${faker.internet.password()}/_aA3`;
 
 export const MOCKED_FIRST_NAME = faker.name.firstName();
 

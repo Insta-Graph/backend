@@ -21,7 +21,7 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_+' }],
-    indent: ['error', 2, { ignoredNodes: ['PropertyDefinition'] }],
+    indent: 'off',
     'class-methods-use-this': 'off',
     'import/extensions': 'off',
     'comma-dangle': 'off',

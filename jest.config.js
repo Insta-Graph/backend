@@ -14,7 +14,7 @@ module.exports = {
   coverageReporters: ['lcov', 'text', 'cobertura'],
   coverageThreshold: {
     global: {
-      branches: 60,
+      branches: 75,
       functions: 75,
       lines: 75,
       statements: 75,
@@ -28,5 +28,10 @@ module.exports = {
     '^entity/(.*)$': '<rootDir>/src/entity/$1',
     '^constants/(.*)$': '<rootDir>/src/constants/$1',
     '^mocked_data/(.*)$': '<rootDir>/src/mocked_data/$1',
+    '^middleware/(.*)$': '<rootDir>/src/middleware/$1',
   },
 };
+
+process.env = Object.assign(process.env, {
+  ENVIRONMENT: 'development',
+});
