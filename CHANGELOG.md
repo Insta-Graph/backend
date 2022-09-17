@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Insta-Graph/backend/compare/v1.3.0...v1.4.0) (2022-09-17)
+
+
+### Features
+
+* revoke tokens through logout mutation ([a779836](https://github.com/Insta-Graph/backend/commit/a779836108f58ffbfb46be0ddee744c0b1fb55c2))
+
 # [1.3.0](https://github.com/Insta-Graph/backend/compare/v1.2.1...v1.3.0) (2022-09-16)
 
 
