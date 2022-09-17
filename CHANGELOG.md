@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/Insta-Graph/backend/compare/v1.4.0...v1.5.0) (2022-09-17)
+
+
+### Features
+
+* change password mutation ([4c58d2d](https://github.com/Insta-Graph/backend/commit/4c58d2d26b11bbbfa2f0a47dd303e352f8bcd6a9))
+
 # [1.4.0](https://github.com/Insta-Graph/backend/compare/v1.3.0...v1.4.0) (2022-09-17)
 
 
