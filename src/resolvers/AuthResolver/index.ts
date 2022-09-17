@@ -7,7 +7,7 @@ import ResponseStatus from '../types/ResponseStatus';
 import isAuthenticated from '../../middleware/auth';
 import { generateTokens } from '../../utils/auth';
 import User from '../../entity/User';
-import { LoginInput } from './input';
+import { ChangePasswordInput, LoginInput } from './input';
 import { AuthResponseUnion } from './types';
 
 @Service()
@@ -47,12 +47,34 @@ export default class AuthResolver {
   @Mutation(() => ResponseStatus)
   @UseMiddleware(isAuthenticated)
   async logout(@Ctx() { res, payload }: CustomContext): Promise<ResponseStatus> {
-    const _id = (payload?.userId ?? '') as unknown as ObjectID;
+    const _id = payload?.userId as unknown as ObjectID;
 
     await this.repository.increment({ _id }, 'tokenVersion', 1);
 
     res.cookie('pub', '', { httpOnly: true, path: '/refresh-token' });
 
     return { success: true, message: 'successfully logged out' };
+  }
+
+  @Mutation(() => ResponseStatus)
+  @UseMiddleware(isAuthenticated)
+  async changePassword(
+    @Ctx() { payload }: CustomContext,
+    @Arg('input', () => ChangePasswordInput) { oldPassword, newPassword }: ChangePasswordInput
+  ): Promise<ResponseStatus> {
+    const _id = payload?.userId as unknown as ObjectID;
+    const user = await this.repository.findOneByOrFail({ _id });
+
+    const isPasswordValid = await argon2.verify(user.password, oldPassword);
+
+    if (!isPasswordValid) {
+      return { success: false, message: 'your current password is incorrect' };
+    }
+
+    const passwordHashed = await argon2.hash(newPassword);
+
+    await this.repository.update({ _id }, { password: passwordHashed });
+
+    return { success: true, message: 'new password set successfully' };
   }
 }

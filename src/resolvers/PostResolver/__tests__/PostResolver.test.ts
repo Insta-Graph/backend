@@ -4,6 +4,57 @@ import Post from 'entity/Post';
 import { createEntityMock, gCall } from 'mocked_data/utils';
 import { MOCKED_POST, MOCKED_POST_ID, MOCKED_POSTS } from 'mocked_data/post';
 
+const createPostMutation = `
+      mutation PostCreate($data: PostCreateInput!) {
+        createPost(
+          input: $data
+        ) {
+          _id
+          title
+          text
+        }
+      }
+    `;
+
+const getPostByIdQuery = `
+      query GetPostById($id: ID!){
+        getPostById(id: $id) {
+          _id
+          title
+          text
+        }
+      }
+    `;
+
+const getPostsQuery = `
+    query GetPostsQuery {
+      getPosts {
+        _id
+        title
+        text
+      }
+    }
+  `;
+
+const deletePostMutation = `
+      mutation PostDelete($id: ID!) {
+        deletePost(
+          id: $id
+        )
+      }
+    `;
+
+const updatePostMutation = `
+      mutation PostUpdate($data: PostUpdateInput!, $id: ID!) {
+        updatePost(
+          id: $id, options: $data
+        ) {
+          _id
+          title
+          text
+        }
+      }
+    `;
 describe('Post Resolver', () => {
   const postModel = sinon.createStubInstance(Post);
   const postRepositoryStub = sinon.stub(Post);
@@ -18,17 +69,6 @@ describe('Post Resolver', () => {
       ...postEntityMock,
     });
 
-    const createPostMutation = `
-      mutation PostCreate($data: PostCreateInput!) {
-        createPost(
-          input: $data
-        ) {
-          _id
-          title
-          text
-        }
-      }
-    `;
     const response = await gCall({
       source: createPostMutation,
       variableValues: {
@@ -58,17 +98,6 @@ describe('Post Resolver', () => {
       })
     );
 
-    const updatePostMutation = `
-      mutation PostUpdate($data: PostUpdateInput!, $id: ID!) {
-        updatePost(
-          id: $id, options: $data
-        ) {
-          _id
-          title
-          text
-        }
-      }
-    `;
     const updatedPost = {
       title: faker.random.words(3),
       text: faker.random.words(6),
@@ -95,14 +124,6 @@ describe('Post Resolver', () => {
   it('deletePost', async () => {
     postRepositoryStub.delete.resolves();
 
-    const deletePostMutation = `
-      mutation PostDelete($id: ID!) {
-        deletePost(
-          id: $id
-        )
-      }
-    `;
-
     const response = await gCall({
       source: deletePostMutation,
       variableValues: {
@@ -124,16 +145,6 @@ describe('Post Resolver', () => {
       }))
     );
 
-    const getPostsQuery = `
-      query ExampleQuery {
-        getPosts {
-          _id
-          title
-          text
-        }
-      }
-    `;
-
     const response = await gCall({
       source: getPostsQuery,
     });
@@ -147,16 +158,6 @@ describe('Post Resolver', () => {
 
   it('getPostById', async () => {
     postRepositoryStub.findOneByOrFail.resolves(createEntityMock(MOCKED_POST));
-
-    const getPostByIdQuery = `
-      query GetPostById($id: ID!){
-        getPostById(id: $id) {
-          _id
-          title
-          text
-        }
-      }
-    `;
 
     const response = await gCall({
       source: getPostByIdQuery,

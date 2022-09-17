@@ -15,6 +15,12 @@ export const authRepositorySuccessfulMocks: RepositoryMock<MyActions> = {
       ...MOCKED_REGISTERED_USER,
     });
   },
+  changePassword: (repositoryStub) => {
+    repositoryStub.findOneByOrFail.resolves({
+      ...MOCKED_REGISTERED_USER,
+    });
+    repositoryStub.update.resolves();
+  },
   logout: (repositoryStub) => {
     repositoryStub.increment.resolves();
   },
@@ -26,5 +32,10 @@ export const authRepositoryUnsuccessfullyMocks: RepositoryMock<MyActions> = {
   },
   logout: (repositoryStub) => {
     repositoryStub.increment.resolves();
+  },
+  changePassword: (repositoryStub) => {
+    repositoryStub.findOneByOrFail.resolves({
+      ...MOCKED_REGISTERED_USER,
+    });
   },
 };
