@@ -1,5 +1,5 @@
 import User from 'entity/User';
-import { MOCKED_REGISTERED_USER, MOCKED_USER_ID } from 'mocked_data/user';
+import { MOCKED_CHANGE_PASSWORD, MOCKED_REGISTERED_USER, MOCKED_USER_ID } from 'mocked_data/user';
 import { gCallWithRepositoryMock } from 'mocked_data/utils';
 import Container from 'typedi';
 import argon2 from 'argon2';
@@ -14,13 +14,28 @@ import {
 } from 'mocked_data/auth';
 import { generateAccessToken } from 'utils/auth';
 
-describe('Auth Resolver', () => {
-  const argonStub = sinon.stub(argon2);
+// COMMON MUTATIONS
+const changePasswordMutation = `
+      mutation changePassword($data: ChangePasswordInput!) {
+        changePassword(
+          input: $data
+        ) {
+          success
+          message
+        }
+      }
+    `;
 
-  it('should login user', async () => {
-    argonStub.verify.resolves(true);
+const logoutMutation = `
+      mutation Logout {
+        logout {
+          success
+          message
+        }
+      }
+    `;
 
-    const loginMutation = `
+const loginMutation = `
       mutation login($data: LoginInput!) {
         login(
           input: $data
@@ -46,6 +61,13 @@ describe('Auth Resolver', () => {
         }
       }
     `;
+
+describe('Auth Resolver', () => {
+  const argonStub = sinon.stub(argon2);
+
+  it('should login user', async () => {
+    argonStub.verify.resolves(true);
+
     const containerId = uuidv4();
 
     const mockedExpressResponse = httpMocks.createResponse();
@@ -87,33 +109,6 @@ describe('Auth Resolver', () => {
     const containerId = uuidv4();
     const mockedExpressResponse = httpMocks.createResponse();
 
-    const loginMutation = `
-      mutation Login($data: LoginInput!) {
-        login(
-          input: $data
-        ) {
-          ... on ResponseStatus {
-            success
-            message
-          }
-          ... on AuthData {
-            user {
-              _id
-              avatar
-              username
-              firstName
-              lastName
-              email
-            }
-            auth {
-              accessToken
-              expiresIn
-            }
-          }
-        }
-      }
-    `;
-
     const response = await gCallWithRepositoryMock({
       source: loginMutation,
       variableValues: {
@@ -143,33 +138,6 @@ describe('Auth Resolver', () => {
     const containerId = uuidv4();
     const mockedExpressResponse = httpMocks.createResponse();
 
-    const loginMutation = `
-      mutation login($data: LoginInput!) {
-        login(
-          input: $data
-        ) {
-          ... on ResponseStatus {
-            success
-            message
-          }
-          ... on AuthData {
-            user {
-              _id
-              avatar
-              username
-              firstName
-              lastName
-              email
-            }
-            auth {
-              accessToken
-              expiresIn
-            }
-          }
-        }
-      }
-    `;
-
     const response = await gCallWithRepositoryMock({
       source: loginMutation,
       variableValues: {
@@ -195,15 +163,78 @@ describe('Auth Resolver', () => {
     Container.reset(containerId);
   });
 
+  it('should change password successfully', async () => {
+    argonStub.verify.resolves(true);
+    argonStub.hash.resolves('');
+    const containerId = uuidv4();
+
+    const signedToken = generateAccessToken(MOCKED_USER_ID);
+
+    const mockedExpressRequest = httpMocks.createRequest({
+      headers: {
+        authorization: `Bearer ${signedToken}`,
+      },
+    });
+
+    const response = await gCallWithRepositoryMock({
+      source: changePasswordMutation,
+      variableValues: {
+        data: { ...MOCKED_CHANGE_PASSWORD },
+      },
+      repositoryMockedData: {
+        methodToMock: authRepositorySuccessfulMocks.changePassword,
+        entityName: User.name,
+      },
+      containerId,
+      contextValue: {
+        req: mockedExpressRequest,
+      },
+    });
+
+    expect(response).toMatchObject({
+      data: {
+        changePassword: { success: true, message: 'new password set successfully' },
+      },
+    });
+    Container.reset(containerId);
+  });
+
+  it('should reject change password when old password does not match', async () => {
+    argonStub.verify.resolves(false);
+    const containerId = uuidv4();
+
+    const signedToken = generateAccessToken(MOCKED_USER_ID);
+
+    const mockedExpressRequest = httpMocks.createRequest({
+      headers: {
+        authorization: `Bearer ${signedToken}`,
+      },
+    });
+
+    const response = await gCallWithRepositoryMock({
+      source: changePasswordMutation,
+      variableValues: {
+        data: { ...MOCKED_CHANGE_PASSWORD },
+      },
+      repositoryMockedData: {
+        methodToMock: authRepositoryUnsuccessfullyMocks.changePassword,
+        entityName: User.name,
+      },
+      containerId,
+      contextValue: {
+        req: mockedExpressRequest,
+      },
+    });
+
+    expect(response).toMatchObject({
+      data: {
+        changePassword: { success: false, message: 'your current password is incorrect' },
+      },
+    });
+    Container.reset(containerId);
+  });
+
   it('should logout user', async () => {
-    const logoutMutation = `
-      mutation Logout {
-        logout {
-          success
-          message
-        }
-      }
-    `;
     const containerId = uuidv4();
 
     const signedToken = generateAccessToken(MOCKED_USER_ID);

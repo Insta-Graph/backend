@@ -59,6 +59,32 @@ const updateUserMutation = `
     }
   `;
 
+const getUsersQuery = `
+      query ExampleQuery {
+        getUsers {
+          _id
+          avatar
+          username
+          firstName
+          lastName
+          email
+        }
+      }
+    `;
+
+const getUserByIdQuery = `
+      query GetUserById($id: ID!){
+        getUserById(id: $id) {
+          _id
+          avatar
+          username
+          firstName
+          lastName
+          email
+        }
+      }
+    `;
+
 describe('User Resolver', () => {
   it('registerUser', async () => {
     const containerId = uuidv4();
@@ -330,19 +356,6 @@ describe('User Resolver', () => {
   it('getUsers', async () => {
     const containerId = uuidv4();
 
-    const getUsersQuery = `
-      query ExampleQuery {
-        getUsers {
-          _id
-          avatar
-          username
-          firstName
-          lastName
-          email
-        }
-      }
-    `;
-
     const response = await gCallWithRepositoryMock({
       source: getUsersQuery,
       repositoryMockedData: {
@@ -362,19 +375,6 @@ describe('User Resolver', () => {
 
   it('getUserById', async () => {
     const containerId = uuidv4();
-
-    const getUserByIdQuery = `
-      query GetUserById($id: ID!){
-        getUserById(id: $id) {
-          _id
-          avatar
-          username
-          firstName
-          lastName
-          email
-        }
-      }
-    `;
 
     const response = await gCallWithRepositoryMock({
       source: getUserByIdQuery,

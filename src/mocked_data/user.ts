@@ -20,6 +20,11 @@ export const MOCKED_REGISTER = {
   lastName: MOCKED_LAST_NAME,
 };
 
+export const MOCKED_CHANGE_PASSWORD = {
+  oldPassword: MOCKED_PASSWORD,
+  newPassword: `${faker.internet.password()}/_aA3`,
+};
+
 export const MOCKED_REGISTERED_USER = {
   _id: MOCKED_USER_ID,
   avatar: null,
