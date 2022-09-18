@@ -20,9 +20,9 @@ class User {
   @Column()
   lastName: string;
 
-  @Field({ nullable: true })
-  @Column()
-  avatar: string;
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  avatar: string | null;
 
   @Field()
   @Column({ unique: true })
@@ -33,6 +33,12 @@ class User {
 
   @Column('int', { default: 0 })
   tokenVersion: number;
+
+  @Column({ nullable: true, default: null })
+  resetToken: string | null;
+
+  @Column('int', { nullable: true, default: null })
+  resetTokenValidity: number | null;
 }
 
 export default User;

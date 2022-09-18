@@ -15,8 +15,8 @@ import { createSchema, setupContainer, formatError } from './utils/graph';
 
 const AppDataSource = new DataSource({
   type: 'mongodb',
-  url: `mongodb://${process.env.DB_USER ?? 'admin'}:${
-    process.env.DB_PASSWORD ?? 'password'
+  url: `mongodb://${process.env.DB_USERNAME ?? ''}:${
+    process.env.DB_PASSWORD ?? ''
   }@db:27017/todo?authSource=admin`,
   useNewUrlParser: true,
   synchronize: true,

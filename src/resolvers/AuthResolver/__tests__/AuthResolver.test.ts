@@ -5,14 +5,17 @@ import Container from 'typedi';
 import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import httpMocks from 'node-mocks-http';
-
+import MockSES from 'aws-sdk/clients/ses';
 import sinon from 'sinon';
 import {
   authRepositorySuccessfulMocks,
   authRepositoryUnsuccessfullyMocks,
   MOCKED_LOGIN,
+  MOCKED_REGISTERED_USER_WITH_RESET_TOKEN_EXPIRED,
 } from 'mocked_data/auth';
 import { generateAccessToken } from 'utils/auth';
+import { MOCKED_RESET_PASSWORD } from '../../../mocked_data/auth';
+import { MOCKED_EMAIL } from '../../../mocked_data/user';
 
 // COMMON MUTATIONS
 const changePasswordMutation = `
@@ -29,6 +32,28 @@ const changePasswordMutation = `
 const logoutMutation = `
       mutation Logout {
         logout {
+          success
+          message
+        }
+      }
+    `;
+
+const forgotPasswordMutation = `
+      mutation ForgotPassword($data: ForgotPasswordInput!) {
+        forgotPassword(
+          input: $data
+        ) {
+          success
+          message
+        }
+      }
+    `;
+
+const resetPasswordMutation = `
+      mutation ResetPassword($data: ResetPasswordInput!) {
+        resetPassword(
+          input: $data
+        ) {
           success
           message
         }
@@ -61,6 +86,14 @@ const loginMutation = `
         }
       }
     `;
+
+jest.mock('aws-sdk/clients/ses', () => {
+  const mSES = {
+    sendTemplatedEmail: jest.fn().mockReturnThis(),
+    promise: jest.fn(),
+  };
+  return jest.fn(() => mSES);
+});
 
 describe('Auth Resolver', () => {
   const argonStub = sinon.stub(argon2);
@@ -276,5 +309,140 @@ describe('Auth Resolver', () => {
     expect(mockedExpressResponse.cookies.pub).toHaveProperty('options.path', '/refresh-token');
 
     Container.reset(containerId);
+  });
+
+  describe('forgotPassword', () => {
+    it('should send confirmation email correctly', async () => {
+      argonStub.hash.resolves('');
+      const mSes = new MockSES();
+      // @ts-ignore
+      mSes.sendTemplatedEmail().promise.mockResolvedValue({ MessageId: 'MOCK' });
+
+      const containerId = uuidv4();
+
+      const response = await gCallWithRepositoryMock({
+        source: forgotPasswordMutation,
+        variableValues: {
+          data: { email: MOCKED_EMAIL },
+        },
+        repositoryMockedData: {
+          methodToMock: authRepositorySuccessfulMocks.forgotPassword,
+          entityName: User.name,
+        },
+        containerId,
+      });
+
+      expect(response).toMatchObject({
+        data: {
+          forgotPassword: { success: true, message: 'An email was sent with next steps' },
+        },
+      });
+      Container.reset(containerId);
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should change password correctly', async () => {
+      argonStub.verify.resolves(true);
+      argonStub.hash.resolves('');
+
+      const containerId = uuidv4();
+
+      const response = await gCallWithRepositoryMock({
+        source: resetPasswordMutation,
+        variableValues: {
+          data: { ...MOCKED_RESET_PASSWORD },
+        },
+        repositoryMockedData: {
+          methodToMock: authRepositorySuccessfulMocks.resetPassword,
+          entityName: User.name,
+        },
+        containerId,
+      });
+
+      expect(response).toMatchObject({
+        data: {
+          resetPassword: { success: true, message: 'Password successfully changed' },
+        },
+      });
+      Container.reset(containerId);
+    });
+
+    it('should reject when user does not exist', async () => {
+      const containerId = uuidv4();
+
+      const response = await gCallWithRepositoryMock({
+        source: resetPasswordMutation,
+        variableValues: {
+          data: { ...MOCKED_RESET_PASSWORD },
+        },
+        repositoryMockedData: {
+          methodToMock: authRepositoryUnsuccessfullyMocks.resetPassword,
+          entityName: User.name,
+        },
+        containerId,
+      });
+
+      expect(response).toMatchObject({
+        data: {
+          resetPassword: { success: false, message: 'User does not exist' },
+        },
+      });
+      Container.reset(containerId);
+    });
+
+    it('should reject when token is not valid', async () => {
+      argonStub.verify.resolves(false);
+
+      const containerId = uuidv4();
+
+      const response = await gCallWithRepositoryMock({
+        source: resetPasswordMutation,
+        variableValues: {
+          data: { ...MOCKED_RESET_PASSWORD },
+        },
+        repositoryMockedData: {
+          methodToMock: authRepositorySuccessfulMocks.resetPassword,
+          entityName: User.name,
+        },
+        containerId,
+      });
+
+      expect(response).toMatchObject({
+        data: {
+          resetPassword: { success: false, message: 'Invalid verification, please try again.' },
+        },
+      });
+      Container.reset(containerId);
+    });
+
+    it('should reject when token is expired', async () => {
+      argonStub.verify.resolves(true);
+
+      const containerId = uuidv4();
+
+      const response = await gCallWithRepositoryMock({
+        source: resetPasswordMutation,
+        variableValues: {
+          data: { ...MOCKED_RESET_PASSWORD },
+        },
+        repositoryMockedData: {
+          methodToMock: (repositoryStub) => {
+            repositoryStub.findOneBy.resolves({
+              ...MOCKED_REGISTERED_USER_WITH_RESET_TOKEN_EXPIRED,
+            });
+          },
+          entityName: User.name,
+        },
+        containerId,
+      });
+
+      expect(response).toMatchObject({
+        data: {
+          resetPassword: { success: false, message: 'Invalid verification, please try again.' },
+        },
+      });
+      Container.reset(containerId);
+    });
   });
 });

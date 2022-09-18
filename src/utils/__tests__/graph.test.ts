@@ -4,8 +4,7 @@ import sinon from 'sinon';
 import { ArgumentValidationError } from 'type-graphql';
 import Container from 'typedi';
 import { DataSource } from 'typeorm';
-import { ENTITIES } from '../../constants';
-import { formatError, setupContainer } from '../graph';
+import { ENTITIES, formatError, setupContainer } from '../graph';
 
 describe('formatError util', () => {
   it('should return the same error when it is from Apollo', () => {

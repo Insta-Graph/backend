@@ -13,8 +13,10 @@ services:
     depends_on:
       - db
     environment:
-      - DB_USERNAME=admin
-      - DB_PASSWORD=password
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - ACCESS_KEY_ID=${ACCESS_KEY_ID}
+      - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
   db:
     image: mongo
     ports:
