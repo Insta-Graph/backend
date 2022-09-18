@@ -17,6 +17,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - ACCESS_KEY_ID=${ACCESS_KEY_ID}
       - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
+      - DB_NAME=${DB_NAME}
   db:
     image: mongo
     ports:
@@ -26,9 +27,9 @@ services:
     volumes:
       - mongo-data:/data/db
     environment:
-      - MONGO_INITDB_DATABASE=todo
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
   mongo-express:
     image: mongo-express
     depends_on:
@@ -40,8 +41,8 @@ services:
     volumes:
       - mongo-data:/data/db
     environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${DB_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${DB_PASSWORD}
       - ME_CONFIG_MONGODB_SERVER=db
 
 networks:
