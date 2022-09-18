@@ -3,9 +3,11 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { Container, ContainerInstance } from 'typedi';
 import { DataSource } from 'typeorm';
 import { ApolloError } from 'apollo-server-express';
+import User from '../entity/User';
 import { HttpError } from '../types/api';
 import { AuthResolver, PostResolver, UserResolver } from '../resolvers';
-import { ENTITIES } from '../constants';
+
+export const ENTITIES = [User] as const;
 
 export const formatError = (error: GraphQLError): GraphQLFormattedError => {
   // eslint-disable-next-line no-param-reassign

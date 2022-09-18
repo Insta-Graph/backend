@@ -2,12 +2,14 @@ import { ObjectID, Repository } from 'typeorm';
 import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from 'type-graphql';
 import argon2 from 'argon2';
 import { Service, Inject } from 'typedi';
+import { v4 as uuidv4 } from 'uuid';
+import { EMAIL_TEMPLATES, FRONTEND_URL, TOKEN_RESET_EXPIRATION } from '../../constants';
+import { sendEmail, getEmailParamsData, generateTokens } from '../../utils/auth';
 import { CustomContext } from '../../types/graph';
 import ResponseStatus from '../types/ResponseStatus';
 import isAuthenticated from '../../middleware/auth';
-import { generateTokens } from '../../utils/auth';
 import User from '../../entity/User';
-import { ChangePasswordInput, LoginInput } from './input';
+import { ChangePasswordInput, ForgotPasswordInput, LoginInput, ResetPasswordInput } from './input';
 import { AuthResponseUnion } from './types';
 
 @Service()
@@ -76,5 +78,65 @@ export default class AuthResolver {
     await this.repository.update({ _id }, { password: passwordHashed });
 
     return { success: true, message: 'new password set successfully' };
+  }
+
+  @Mutation(() => ResponseStatus)
+  async forgotPassword(
+    @Arg('input', () => ForgotPasswordInput) { email }: ForgotPasswordInput
+  ): Promise<ResponseStatus> {
+    const user = await this.repository.findOneBy({ email });
+
+    if (user) {
+      const resetToken = uuidv4();
+
+      const hashedToken = await argon2.hash(resetToken);
+
+      await this.repository.update(
+        { _id: user._id },
+        { resetToken: hashedToken, resetTokenValidity: Date.now() + TOKEN_RESET_EXPIRATION * 1000 }
+      );
+
+      const emailParams = getEmailParamsData({
+        destinationEmails: [user.email],
+        template: EMAIL_TEMPLATES.forgotPassword.templateName,
+        templateData: EMAIL_TEMPLATES.forgotPassword.formatTemplateData(
+          `${FRONTEND_URL}/reset-password/${resetToken}`
+        ),
+      });
+      await sendEmail(emailParams);
+    }
+    return { success: true, message: 'An email was sent with next steps' };
+  }
+
+  @Mutation(() => ResponseStatus)
+  async resetPassword(
+    @Arg('input', () => ResetPasswordInput) { email, token, password }: ResetPasswordInput
+  ): Promise<ResponseStatus> {
+    const user = await this.repository.findOneBy({ email });
+
+    if (!user) {
+      return { success: false, message: 'User does not exist' };
+    }
+
+    const isAuthenticToken = await argon2.verify(user.resetToken ?? '', token);
+
+    const isTokenExpired = Date.now() >= (user.resetTokenValidity ?? 0);
+
+    if (!isAuthenticToken || isTokenExpired) {
+      return { success: false, message: 'Invalid verification, please try again.' };
+    }
+
+    const hashedToken = await argon2.hash(password);
+
+    user.resetToken = null;
+    user.resetTokenValidity = null;
+    user.password = hashedToken;
+
+    await this.repository.update(
+      { _id: user._id },
+      { resetToken: null, resetTokenValidity: null, password: hashedToken }
+    );
+
+    return { success: true, message: 'Password successfully changed' };
   }
 }

@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import crypto from 'crypto';
-import User from '../entity/User';
 
 dotenv.config();
 
@@ -14,8 +13,24 @@ export const ENVIRONMENT = process.env.ENVIRONMENT ?? false;
 
 export const IS_DEVELOPMENT_ENV = ENVIRONMENT && ENVIRONMENT === 'development';
 
+export const FRONTEND_URL = IS_DEVELOPMENT_ENV ? 'http://localhost:3002' : 'http://localhost:3002';
+
+export const SOURCE_EMAIL_ADDRESS = process.env.SOURCE_EMAIL_ADDRESS ?? 'app.snapify@gmail.com';
+
+export const ACCESS_KEY_ID = process.env.ACCESS_KEY_ID ?? '';
+
+export const SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY ?? '';
+
 export const TOKEN_EXPIRATION = 900;
 
 export const TOKEN_REFRESH_EXPIRATION = 86400;
 
-export const ENTITIES = [User] as const;
+export const TOKEN_RESET_EXPIRATION = 300;
+
+export const EMAIL_TEMPLATES = {
+  forgotPassword: {
+    templateName: 'ForgotPasswordTemplate',
+    formatTemplateData: (redirectUrl: string) =>
+      `{ "url":"${redirectUrl}", "frontend_url": "${FRONTEND_URL}" }`,
+  },
+};
