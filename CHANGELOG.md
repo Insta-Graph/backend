@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Insta-Graph/backend/compare/v1.5.0...v1.6.0) (2022-09-18)
+
+
+### Features
+
+* set forget and reset password mutations ([04e8c2e](https://github.com/Insta-Graph/backend/commit/04e8c2e6efdd6799ec8bed11e0657f4bcea60c54))
+
 # [1.5.0](https://github.com/Insta-Graph/backend/compare/v1.4.0...v1.5.0) (2022-09-17)
 
 
