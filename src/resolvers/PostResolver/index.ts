@@ -1,9 +1,10 @@
 import { ObjectID } from 'typeorm';
-import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, ID, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql';
 import { v4 as uuidv4 } from 'uuid';
 import { Service } from 'typedi';
 import Post from '../../entity/Post';
 import { PostCreateInput, PostUpdateInput } from './input';
+import isAuthenticated from '../../middleware/auth';
 
 @Service()
 @Resolver()
@@ -38,6 +39,7 @@ export default class PostResolver {
   }
 
   @Query(() => [Post])
+  @UseMiddleware(isAuthenticated)
   async getPosts() {
     const posts = await Post.find();
     return posts;

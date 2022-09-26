@@ -38,6 +38,7 @@ export default class UserResolver {
       email,
       password: hashedPassword,
       username: `${firstName} ${lastName}`,
+      tokenVersion: 0,
     });
 
     await this.repository.save(newUser);
@@ -68,6 +69,7 @@ export default class UserResolver {
   }
 
   @Query(() => User)
+  @UseMiddleware(isAuthenticated)
   async getUserById(@Arg('id', () => ID) id: ObjectID) {
     const newUser = await this.repository.findOneByOrFail({ _id: id });
     return newUser;
