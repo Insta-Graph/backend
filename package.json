@@ -37,7 +37,7 @@
     "mongodb": "^4.9.1",
     "mongoose": "^6.3.0",
     "reflect-metadata": "^0.1.13",
-    "serverless-webpack": "5.5.2",
+    "serverless-webpack": "5.10.0",
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
     "typeorm": "^0.3.9",
