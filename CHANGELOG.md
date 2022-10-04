@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/Insta-Graph/backend/compare/v1.6.0...v1.7.0) (2022-10-04)
+
+
+### Features
+
+* add production environment in AWS lambda ([1398ab6](https://github.com/Insta-Graph/backend/commit/1398ab66e0ee919d30f66199a332f3f2b9f0286e))
+
 # [1.6.0](https://github.com/Insta-Graph/backend/compare/v1.5.0...v1.6.0) (2022-09-18)
 
 
