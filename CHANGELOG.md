@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/Insta-Graph/backend/compare/v1.7.1...v1.7.2) (2022-10-04)
+
+
+### Bug Fixes
+
+* deploy code manually on new release published ([96ef786](https://github.com/Insta-Graph/backend/commit/96ef786db9d38e0088cdb86216ddf05d2402de19))
+
 ## [1.7.1](https://github.com/Insta-Graph/backend/compare/v1.7.0...v1.7.1) (2022-10-04)
 
 
