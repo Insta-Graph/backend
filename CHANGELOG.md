@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/Insta-Graph/backend/compare/v1.7.0...v1.7.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* removing useless code ([820cd6b](https://github.com/Insta-Graph/backend/commit/820cd6b2c0f5952ed032fb0c4cde764422100bfc))
+
 # [1.7.0](https://github.com/Insta-Graph/backend/compare/v1.6.0...v1.7.0) (2022-10-04)
 
 
