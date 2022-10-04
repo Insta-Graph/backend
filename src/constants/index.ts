@@ -13,13 +13,9 @@ export const ENVIRONMENT = process.env.ENVIRONMENT ?? false;
 
 export const IS_DEVELOPMENT_ENV = ENVIRONMENT && ENVIRONMENT === 'development';
 
-export const FRONTEND_URL = IS_DEVELOPMENT_ENV ? 'http://localhost:3002' : 'http://localhost:3002';
+export const FRONTEND_URL = IS_DEVELOPMENT_ENV ? 'http://localhost:3002' : process.env.FRONTEND_URL;
 
 export const SOURCE_EMAIL_ADDRESS = process.env.SOURCE_EMAIL_ADDRESS ?? 'app.snapify@gmail.com';
-
-export const ACCESS_KEY_ID = process.env.ACCESS_KEY_ID ?? '';
-
-export const SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY ?? '';
 
 export const TOKEN_EXPIRATION = 900;
 

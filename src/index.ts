@@ -15,15 +15,15 @@ import { createSchema, setupContainer, formatError } from './utils/graph';
 
 const AppDataSource = new DataSource({
   type: 'mongodb',
-  url: `mongodb://${process.env.DB_USERNAME ?? ''}:${
-    process.env.DB_PASSWORD ?? ''
-  }@db:27017/todo?authSource=admin`,
+  url: `mongodb+srv://${process.env.DB_USERNAME ?? ''}:${process.env.DB_PASSWORD ?? ''}@${
+    process.env.DB_CLUSTER_URL ?? ''
+  }`,
   useNewUrlParser: true,
   synchronize: true,
   logging: true,
+  ssl: true,
   entities: ['src/entity/**/*.ts'],
   subscribers: ['src/subscriber/**/*.ts'],
-  migrations: ['src/migration/**/*.ts'],
 });
 
 const connectToDatabase = async () => {

@@ -1,4 +1,4 @@
-import { buildSchema, ArgumentValidationError } from 'type-graphql';
+import { buildSchema, ArgumentValidationError, buildSchemaSync } from 'type-graphql';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { Container, ContainerInstance } from 'typedi';
 import { DataSource } from 'typeorm';
@@ -48,6 +48,13 @@ export const setupContainer = (dataSource: DataSource): void => {
 
 export const createSchema = (containerInstance?: ContainerInstance) =>
   buildSchema({
+    resolvers: [PostResolver, UserResolver, AuthResolver],
+    validate: true,
+    container: containerInstance ?? Container,
+  });
+
+export const createSchemaSync = (containerInstance?: ContainerInstance) =>
+  buildSchemaSync({
     resolvers: [PostResolver, UserResolver, AuthResolver],
     validate: true,
     container: containerInstance ?? Container,

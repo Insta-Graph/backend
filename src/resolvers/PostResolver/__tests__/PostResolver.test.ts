@@ -12,6 +12,7 @@ const createPostMutation = `
           _id
           title
           text
+          userId
         }
       }
     `;
@@ -22,6 +23,7 @@ const getPostByIdQuery = `
           _id
           title
           text
+          userId
         }
       }
     `;
@@ -32,6 +34,7 @@ const getPostsQuery = `
         _id
         title
         text
+        userId
       }
     }
   `;
@@ -52,9 +55,11 @@ const updatePostMutation = `
           _id
           title
           text
+          userId
         }
       }
     `;
+
 describe('Post Resolver', () => {
   const postModel = sinon.createStubInstance(Post);
   const postRepositoryStub = sinon.stub(Post);
@@ -72,7 +77,7 @@ describe('Post Resolver', () => {
     const response = await gCall({
       source: createPostMutation,
       variableValues: {
-        data: { title: MOCKED_POST.title, text: MOCKED_POST.text },
+        data: { title: MOCKED_POST.title, text: MOCKED_POST.text, userId: MOCKED_POST.userId },
       },
     });
 

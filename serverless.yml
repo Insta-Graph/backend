@@ -1,0 +1,54 @@
+service: snapify-backend
+frameworkVersion: '>=2.35.0'
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  timeout: 30
+  lambdaHashingVersion: '20201221'
+  region: us-east-1
+  environment:
+    NODE_OPTIONS: '--enable-source-maps'
+    DB_USERNAME: ${opt:dbuser}
+    DB_PASSWORD: ${opt:password}
+    JWT_ACCESS_SECRET: ${ssm:SNAPIFY_ACCESS_TOKEN_SECRET}
+    JWT_REFRESH_SECRET: ${ssm:SNAPIFY_REFRESH_TOKEN_SECRET}
+    ENVIRONMENT: 'production'
+    DB_CLUSTER_URL: ${ssm:SNAPIFY_DB_CLUSTER_URL}
+    FRONTEND_URL: ${ssm:SNAPIFY_FRONTEND_URL}
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - 'ses:SendTemplatedEmail'
+          Resource:
+            - 'arn:aws:ses:*:134930014779:template/*'
+            - 'arn:aws:ses:*:134930014779:identity/*'
+
+functions:
+  app:
+    handler: src/lambda.graphqlHandler
+    events:
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+
+custom:
+  webpack:
+    packager: 'yarn'
+    packagerOptions:
+      scripts:
+        - npm_config_platform=linux npm_config_arch=x64 yarn add argon2
+    includeModules: true
+    keepOutputDirectory: true
+    webpackConfig: 'webpack.config.js'
+    excludeFiles: src/**/*.test.ts

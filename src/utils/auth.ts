@@ -1,13 +1,11 @@
 import jwt from 'jsonwebtoken';
-import { config, Credentials } from 'aws-sdk';
+import { config } from 'aws-sdk';
 import SES from 'aws-sdk/clients/ses';
 import {
-  ACCESS_KEY_ID,
   ACCESS_TOKEN_SECRET,
   EMAIL_TEMPLATES,
   FRONTEND_URL,
   REFRESH_TOKEN_SECRET,
-  SECRET_ACCESS_KEY,
   SOURCE_EMAIL_ADDRESS,
   TOKEN_EXPIRATION,
   TOKEN_REFRESH_EXPIRATION,
@@ -26,8 +24,6 @@ export const generateTokens = (userId: string, tokenVersion: number) => ({
   refreshToken: generateRefreshToken(userId, tokenVersion),
   expiresIn: TOKEN_EXPIRATION,
 });
-
-config.credentials = new Credentials(ACCESS_KEY_ID, SECRET_ACCESS_KEY);
 
 config.update({ region: 'us-east-1' });
 

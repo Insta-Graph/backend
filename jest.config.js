@@ -10,6 +10,7 @@ module.exports = {
     'src/locales/',
     'src/constants/',
     'src/index',
+    'src/lambda',
   ],
   coverageReporters: ['lcov', 'text', 'cobertura'],
   coverageThreshold: {

@@ -11,7 +11,7 @@ export default class PostResolver {
   @Mutation(() => Post)
   async createPost(@Arg('input', () => PostCreateInput) input: PostCreateInput) {
     const id = uuidv4();
-    const newPost = await Post.create({ _id: id, text: input.text, title: input.title }).save();
+    const newPost = await Post.create({ _id: id, ...input }).save();
     return newPost;
   }
 

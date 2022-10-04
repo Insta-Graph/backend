@@ -1,4 +1,4 @@
-import { Length, MinLength } from 'class-validator';
+import { Length, MinLength, IsUUID } from 'class-validator';
 import { InputType, Field } from 'type-graphql';
 
 @InputType()
@@ -10,4 +10,8 @@ export default class PostCreateInput {
   @Field({ nullable: true })
   @MinLength(1)
   text: string;
+
+  @Field()
+  @IsUUID()
+  userId: string;
 }
