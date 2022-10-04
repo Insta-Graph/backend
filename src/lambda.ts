@@ -91,7 +91,6 @@ function bootstrapServer(event: APIGatewayEvent, context: Context) {
 export const graphqlHandler = async (event: APIGatewayEvent, context: Context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
-  console.log('Here...');
   console.log(process.env.FRONTEND_URL);
 
   await connectToDatabase();
