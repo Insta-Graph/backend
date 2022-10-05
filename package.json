@@ -1,6 +1,6 @@
 {
   "name": "graph-book-backend",
-  "version": "1.7.5",
+  "version": "1.8.0",
   "main": "index.js",
   "author": "Edward Ramírez <edal_ramirez@hotmail.com>",
   "description": "GraphQL express backend for micro frontend client",

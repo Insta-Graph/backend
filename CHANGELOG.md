@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/Insta-Graph/backend/compare/v1.7.5...v1.8.0) (2022-10-05)
+
+
+### Features
+
+* assume role to deploy through serverless ([a6b0f31](https://github.com/Insta-Graph/backend/commit/a6b0f317dbbe668bf44445ca8d103290ecb23bff))
+
 ## [1.7.5](https://github.com/Insta-Graph/backend/compare/v1.7.4...v1.7.5) (2022-10-05)
 
 
