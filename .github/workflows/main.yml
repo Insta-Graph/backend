@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [master]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   test:
     name: Test backend project
@@ -19,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Installing dependencies
         uses: ./.github/actions/install_deps
         with:
@@ -34,13 +38,27 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           persist-credentials: false
       - name: Installing dependencies
         uses: ./.github/actions/install_deps
         with:
           node-version: ${{ matrix.node-version }}
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.DEPLOYMENT_ROLE }}
+          role-session-name: DeployBackendSession
+          role-duration-seconds: 900
+          aws-region: us-east-1
+      - name: Install serverless
+        run: npm i -g serverless@2.72.2
+      - name: Deploy to AWS Lambda
+        run: serverless deploy --verbose --dbuser ${DB_USERNAME} --password ${DB_PASSWORD} --stage prod
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       - name: Release new version
         run: yarn semantic-release
         env:

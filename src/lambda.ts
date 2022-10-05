@@ -92,7 +92,7 @@ function bootstrapServer(event: APIGatewayEvent, context: Context) {
   );
 
   app.get('/', (_, res) => {
-    res.status(200).send('<h1>Here</h1>');
+    res.status(200).send('<h1>Here...</h1>');
   });
 
   app.use(errorMiddleware);
