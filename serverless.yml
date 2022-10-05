@@ -20,7 +20,15 @@ provider:
     DB_CLUSTER_URL: ${ssm:SNAPIFY_DB_CLUSTER_URL}
     FRONTEND_URL: ${ssm:SNAPIFY_FRONTEND_URL}
   httpApi:
-    cors: true
+    cors:
+      allowedOrigins:
+        - ${ssm:SNAPIFY_FRONTEND_URL}
+        - ${ssm:SNAPIFY_LOCALHOST}
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowCredentials: true
+
   iam:
     role:
       statements:
