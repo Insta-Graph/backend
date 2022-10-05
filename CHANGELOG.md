@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/Insta-Graph/backend/compare/v1.7.2...v1.7.3) (2022-10-05)
+
+
+### Bug Fixes
+
+* strict cors to specific hosts ([2bbe310](https://github.com/Insta-Graph/backend/commit/2bbe310df335dfd157456baea141f716db0ab185))
+
 ## [1.7.2](https://github.com/Insta-Graph/backend/compare/v1.7.1...v1.7.2) (2022-10-04)
 
 
