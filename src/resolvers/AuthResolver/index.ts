@@ -51,7 +51,9 @@ export default class AuthResolver {
   async logout(@Ctx() { res, payload }: CustomContext): Promise<ResponseStatus> {
     const _id = payload?.userId as unknown as ObjectID;
 
-    await this.repository.increment({ _id }, 'tokenVersion', 1);
+    const user = await this.repository.findOneByOrFail({ _id });
+
+    await this.repository.update({ _id }, { tokenVersion: user.tokenVersion + 1 });
 
     res.cookie('pub', '', { httpOnly: true, path: '/refresh-token' });
 

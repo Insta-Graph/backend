@@ -41,7 +41,11 @@ export const authRepositorySuccessfulMocks: RepositoryMock<MyActions> = {
     repositoryStub.update.resolves();
   },
   logout: (repositoryStub) => {
-    repositoryStub.increment.resolves();
+    repositoryStub.findOneByOrFail.resolves({
+      ...MOCKED_REGISTERED_USER,
+      tokenVersion: 0,
+    });
+    repositoryStub.update.resolves();
   },
   forgotPassword: (repositoryStub) => {
     repositoryStub.findOneBy.resolves({
@@ -62,7 +66,11 @@ export const authRepositoryUnsuccessfullyMocks: RepositoryMock<MyActions> = {
     repositoryStub.findOneBy.resolves(null);
   },
   logout: (repositoryStub) => {
-    repositoryStub.increment.resolves();
+    repositoryStub.findOneByOrFail.resolves({
+      ...MOCKED_REGISTERED_USER,
+      tokenVersion: 0,
+    });
+    repositoryStub.update.resolves();
   },
   changePassword: (repositoryStub) => {
     repositoryStub.findOneByOrFail.resolves({

@@ -289,7 +289,6 @@ describe('Auth Resolver', () => {
       containerId,
       contextValue: {
         req: mockedExpressRequest,
-
         res: mockedExpressResponse,
       },
     });
