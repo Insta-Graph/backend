@@ -1,3 +1,10 @@
+## [1.7.5](https://github.com/Insta-Graph/backend/compare/v1.7.4...v1.7.5) (2022-10-05)
+
+
+### Bug Fixes
+
+* use update method to increment token version on logout ([fb0e352](https://github.com/Insta-Graph/backend/commit/fb0e352013f3228aa1e87f8623c5aec9dde6a37e))
+
 ## [1.7.4](https://github.com/Insta-Graph/backend/compare/v1.7.3...v1.7.4) (2022-10-05)
 
 
