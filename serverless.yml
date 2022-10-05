@@ -19,6 +19,7 @@ provider:
     ENVIRONMENT: 'production'
     DB_CLUSTER_URL: ${ssm:SNAPIFY_DB_CLUSTER_URL}
     FRONTEND_URL: ${ssm:SNAPIFY_FRONTEND_URL}
+    DEV_FRONTEND_URL: ${ssm:SNAPIFY_LOCALHOST}
   httpApi:
     cors:
       allowedOrigins:
@@ -28,6 +29,7 @@ provider:
         - Content-Type
         - Authorization
       allowCredentials: true
+      maxAge: 86400
 
   iam:
     role:

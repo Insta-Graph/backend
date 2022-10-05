@@ -11,6 +11,8 @@ import Container from 'typedi';
 import { APIGatewayEvent, Context } from 'aws-lambda';
 import Post from 'entity/Post';
 import User from 'entity/User';
+import cors from 'cors';
+import { CORS_WHITELIST } from './constants';
 import RefreshTokenService from './middleware/refreshToken';
 import errorMiddleware from './middleware/error';
 import { createSchemaSync, setupContainer } from './utils/graph';
@@ -58,6 +60,19 @@ function bootstrapServer(event: APIGatewayEvent, context: Context) {
   dotenv.config();
 
   setupContainer(AppDataSource);
+
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (CORS_WHITELIST.indexOf(origin ?? '') !== -1 || !origin) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+    })
+  );
 
   app.use(cookieParser());
 

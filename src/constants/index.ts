@@ -13,7 +13,13 @@ export const ENVIRONMENT = process.env.ENVIRONMENT ?? false;
 
 export const IS_DEVELOPMENT_ENV = ENVIRONMENT && ENVIRONMENT === 'development';
 
-export const FRONTEND_URL = IS_DEVELOPMENT_ENV ? 'http://localhost:3002' : process.env.FRONTEND_URL;
+export const PROD_FRONTEND_URL = process.env.FRONTEND_URL ?? '';
+
+export const DEV_FRONTEND_URL = process.env.DEV_FRONTEND_URL ?? '';
+
+export const FRONTEND_URL = IS_DEVELOPMENT_ENV ? DEV_FRONTEND_URL : PROD_FRONTEND_URL;
+
+export const CORS_WHITELIST = [PROD_FRONTEND_URL, DEV_FRONTEND_URL];
 
 export const SOURCE_EMAIL_ADDRESS = process.env.SOURCE_EMAIL_ADDRESS ?? 'app.snapify@gmail.com';
 
