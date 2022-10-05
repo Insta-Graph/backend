@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/Insta-Graph/backend/compare/v1.7.3...v1.7.4) (2022-10-05)
+
+
+### Bug Fixes
+
+* use cors middleware in order to add right headers ([d174d4b](https://github.com/Insta-Graph/backend/commit/d174d4b28bd106ca1c0a322b06c9886de323d873))
+
 ## [1.7.3](https://github.com/Insta-Graph/backend/compare/v1.7.2...v1.7.3) (2022-10-05)
 
 
