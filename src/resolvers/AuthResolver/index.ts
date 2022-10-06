@@ -102,7 +102,7 @@ export default class AuthResolver {
         destinationEmails: [user.email],
         template: EMAIL_TEMPLATES.forgotPassword.templateName,
         templateData: EMAIL_TEMPLATES.forgotPassword.formatTemplateData(
-          `${FRONTEND_URL}/reset-password/${resetToken}`
+          `${FRONTEND_URL}/auth/reset-password/${resetToken}`
         ),
       });
       await sendEmail(emailParams);
