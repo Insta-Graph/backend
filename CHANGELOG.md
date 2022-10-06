@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/Insta-Graph/backend/compare/v1.8.0...v1.8.1) (2022-10-06)
+
+
+### Bug Fixes
+
+* set auth prefix at reset password email url ([92d4e8f](https://github.com/Insta-Graph/backend/commit/92d4e8f9e75fe70f24920ea0e0f0951fdd0dc8cb))
+
 # [1.8.0](https://github.com/Insta-Graph/backend/compare/v1.7.5...v1.8.0) (2022-10-05)
 
 
